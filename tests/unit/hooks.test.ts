@@ -24,10 +24,15 @@ afterEach(async () => {
 
 describe("agent hooks", () => {
   it("extracts every target from a Codex patch", () => {
-    expect(extractHookRequests("codex", {
-      tool_name: "apply_patch",
-      tool_input: { command: "*** Begin Patch\n*** Update File: src/a.ts\n*** Delete File: src/b.ts\n*** End Patch" },
-    })).toEqual([
+    expect(
+      extractHookRequests("codex", {
+        tool_name: "apply_patch",
+        tool_input: {
+          command:
+            "*** Begin Patch\n*** Update File: src/a.ts\n*** Delete File: src/b.ts\n*** End Patch",
+        },
+      }),
+    ).toEqual([
       { agent: "codex", operation: "write", path: "src/a.ts" },
       { agent: "codex", operation: "delete", path: "src/b.ts" },
     ]);
@@ -41,10 +46,12 @@ describe("agent hooks", () => {
       policies: { write: "deny" },
       audit: { enabled: false },
     });
-    await expect(evaluateToolHook(guard, "claude-code", {
-      tool_name: "Write",
-      tool_input: { file_path: path.join(root, "src/a.ts"), content: "secret-not-logged" },
-    })).resolves.toMatchObject({ decision: "deny", reason: "OPERATION_POLICY" });
+    await expect(
+      evaluateToolHook(guard, "claude-code", {
+        tool_name: "Write",
+        tool_input: { file_path: path.join(root, "src/a.ts"), content: "secret-not-logged" },
+      }),
+    ).resolves.toMatchObject({ decision: "deny", reason: "OPERATION_POLICY" });
   });
 
   it("preserves ask so the host can show its native approval", async () => {
@@ -55,31 +62,46 @@ describe("agent hooks", () => {
       policies: { write: "ask" },
       audit: { enabled: false },
     });
-    await expect(evaluateToolHook(guard, "cursor", {
-      tool_name: "Write", tool_input: { file_path: path.join(root, "src/a.ts") },
-    })).resolves.toMatchObject({ decision: "ask" });
+    await expect(
+      evaluateToolHook(guard, "cursor", {
+        tool_name: "Write",
+        tool_input: { file_path: path.join(root, "src/a.ts") },
+      }),
+    ).resolves.toMatchObject({ decision: "ask" });
   });
 
   it.each([
     [ClaudeCodeAdapter, ".claude/settings.json", "PreToolUse"],
     [CursorAdapter, ".cursor/hooks.json", "preToolUse"],
     [CodexAdapter, ".codex/hooks.json", "PreToolUse"],
-  ] as const)("installs and removes %p without deleting unrelated hooks", async (Adapter, relative, event) => {
-    const root = await workspace();
-    const target = path.join(root, relative);
-    await mkdir(path.dirname(target), { recursive: true });
-    await writeFile(target, JSON.stringify({ hooks: { SessionStart: [{ command: "keep-me" }] } }));
-    const adapter = new Adapter(root);
-    await adapter.install();
-    const installed = JSON.parse(await readFile(target, "utf8")) as { hooks: Record<string, unknown[]> };
-    expect(installed.hooks[event]).toHaveLength(1);
-    expect(installed.hooks.SessionStart).toEqual([{ command: "keep-me" }]);
-    await adapter.install();
-    const idempotent = JSON.parse(await readFile(target, "utf8")) as { hooks: Record<string, unknown[]> };
-    expect(idempotent.hooks[event]).toHaveLength(1);
-    await adapter.uninstall();
-    const removed = JSON.parse(await readFile(target, "utf8")) as { hooks: Record<string, unknown[]> };
-    expect(removed.hooks[event]).toBeUndefined();
-    expect(removed.hooks.SessionStart).toEqual([{ command: "keep-me" }]);
-  });
+  ] as const)(
+    "installs and removes %p without deleting unrelated hooks",
+    async (Adapter, relative, event) => {
+      const root = await workspace();
+      const target = path.join(root, relative);
+      await mkdir(path.dirname(target), { recursive: true });
+      await writeFile(
+        target,
+        JSON.stringify({ hooks: { SessionStart: [{ command: "keep-me" }] } }),
+      );
+      const adapter = new Adapter(root);
+      await adapter.install();
+      const installed = JSON.parse(await readFile(target, "utf8")) as {
+        hooks: Record<string, unknown[]>;
+      };
+      expect(installed.hooks[event]).toHaveLength(1);
+      expect(installed.hooks.SessionStart).toEqual([{ command: "keep-me" }]);
+      await adapter.install();
+      const idempotent = JSON.parse(await readFile(target, "utf8")) as {
+        hooks: Record<string, unknown[]>;
+      };
+      expect(idempotent.hooks[event]).toHaveLength(1);
+      await adapter.uninstall();
+      const removed = JSON.parse(await readFile(target, "utf8")) as {
+        hooks: Record<string, unknown[]>;
+      };
+      expect(removed.hooks[event]).toBeUndefined();
+      expect(removed.hooks.SessionStart).toEqual([{ command: "keep-me" }]);
+    },
+  );
 });

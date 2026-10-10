@@ -31,7 +31,8 @@ export class ApprovalManager {
   async request(request: EvaluationRequest, correlationId: string): Promise<string | undefined> {
     const binding = this.binding(request);
     for (const [token, grant] of this.grants) {
-      if (grant.reusable && grant.binding === binding && grant.expiresAt >= Date.now()) return token;
+      if (grant.reusable && grant.binding === binding && grant.expiresAt >= Date.now())
+        return token;
     }
     if (!this.handler) return undefined;
     let timer: NodeJS.Timeout | undefined;

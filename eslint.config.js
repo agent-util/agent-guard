@@ -18,8 +18,16 @@ export default tseslint.config(
   prettier,
   {
     languageOptions: {
-      parserOptions: { projectService: true, tsconfigRootDir: import.meta.dirname },
+      parserOptions: {
+        projectService: { allowDefaultProject: ["scripts/*.mjs"] },
+        tsconfigRootDir: import.meta.dirname,
+      },
     },
     rules: { "@typescript-eslint/require-await": "off" },
+  },
+  {
+    files: ["scripts/*.mjs"],
+    languageOptions: { globals: { console: "readonly", process: "readonly" } },
+    rules: { "@typescript-eslint/no-unsafe-assignment": "off" },
   },
 );

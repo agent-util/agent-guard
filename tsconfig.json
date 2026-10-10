@@ -15,6 +15,13 @@
     "rootDir": ".",
     "types": ["node", "vitest/globals"]
   },
-  "include": ["src", "tests", "examples", "docs/.vitepress/**/*.ts", "vitest.config.ts", "tsup.config.ts"],
+  "include": [
+    "src",
+    "tests",
+    "examples",
+    "docs/.vitepress/**/*.ts",
+    "vitest.config.ts",
+    "tsup.config.ts"
+  ],
   "exclude": ["dist", "node_modules"]
 }

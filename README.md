@@ -173,14 +173,14 @@ Webhook delivery is disabled until explicitly configured and omits filesystem pa
 
 ## Compatibility matrix
 
-| Integration  |        Read |       Write |      Delete |     Execute |    Approval |       Audit | Enforcement scope                            |
-| ------------ | ----------: | ----------: | ----------: | ----------: | ----------: | ----------: | -------------------------------------------- |
-| Node SDK     |         Yes |         Yes |         Yes |          No |         Yes |         Yes | Calls through `GuardedFs`                    |
-| MCP wrapper  |         Yes |         Yes |         Yes |         Yes |         Yes |         Yes | Registered wrapped tools only                |
-| Claude Code  |         Yes |         Yes |          No |          No |         Yes |         Yes | Matched `PreToolUse` direct file tools       |
-| Cursor       |         Yes |         Yes |          No |          No |         Yes |         Yes | Matched `preToolUse` direct file tools       |
-| OpenAI Codex |          No |         Yes |         Yes |          No |         Yes |         Yes | `apply_patch` through project hooks          |
-| Watcher      |          No |          No |          No |          No |          No |         Yes | Audit-only changes; reads are not observable |
+| Integration  | Read | Write | Delete | Execute | Approval | Audit | Enforcement scope                            |
+| ------------ | ---: | ----: | -----: | ------: | -------: | ----: | -------------------------------------------- |
+| Node SDK     |  Yes |   Yes |    Yes |      No |      Yes |   Yes | Calls through `GuardedFs`                    |
+| MCP wrapper  |  Yes |   Yes |    Yes |     Yes |      Yes |   Yes | Registered wrapped tools only                |
+| Claude Code  |  Yes |   Yes |     No |      No |      Yes |   Yes | Matched `PreToolUse` direct file tools       |
+| Cursor       |  Yes |   Yes |     No |      No |      Yes |   Yes | Matched `preToolUse` direct file tools       |
+| OpenAI Codex |   No |   Yes |    Yes |      No |      Yes |   Yes | `apply_patch` through project hooks          |
+| Watcher      |   No |    No |     No |      No |       No |   Yes | Audit-only changes; reads are not observable |
 
 ## Security architecture and limitations
 

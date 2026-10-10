@@ -13,7 +13,10 @@ export interface McpToolRule {
 
 export class McpAccessDeniedError extends Error {
   readonly code = "AGENT_GUARD_DENIED";
-  constructor(readonly data: unknown, tool: string) {
+  constructor(
+    readonly data: unknown,
+    tool: string,
+  ) {
     super(`Agent Guard denied MCP tool ${tool}`);
     this.name = "McpAccessDeniedError";
   }

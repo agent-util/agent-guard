@@ -1,7 +1,12 @@
 import { access, mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import type { AgentGuard } from "../core/guard.js";
-import type { AgentAdapter, AgentCapabilities, EvaluationRequest, PolicyDecision } from "../types/index.js";
+import type {
+  AgentAdapter,
+  AgentCapabilities,
+  EvaluationRequest,
+  PolicyDecision,
+} from "../types/index.js";
 
 export interface ToolHookInput {
   hook_event_name?: string;
@@ -30,7 +35,11 @@ const fileTools: Record<string, { operation: EvaluationRequest["operation"]; key
 
 function object(value: unknown): Record<string, unknown> {
   if (typeof value === "string") {
-    try { return object(JSON.parse(value)); } catch { return {}; }
+    try {
+      return object(JSON.parse(value));
+    } catch {
+      return {};
+    }
   }
   return value !== null && typeof value === "object" && !Array.isArray(value)
     ? (value as Record<string, unknown>)
@@ -67,7 +76,9 @@ export function extractHookRequests(agent: string, input: ToolHookInput): Evalua
   }
   const rule = fileTools[tool];
   if (!rule) return [];
-  const paths = rule.keys.map((key) => values[key]).filter((value): value is string => typeof value === "string");
+  const paths = rule.keys
+    .map((key) => values[key])
+    .filter((value): value is string => typeof value === "string");
   return [...new Set(paths)].map((target) => ({ agent, operation: rule.operation, path: target }));
 }
 
@@ -95,13 +106,18 @@ export abstract class ProjectHookAdapter implements AgentAdapter {
   abstract capabilities(): AgentCapabilities;
   constructor(readonly projectRoot = process.cwd()) {}
   async detect(): Promise<boolean> {
-    return access(path.join(this.projectRoot, this.configRelativePath)).then(() => true, () => false);
+    return access(path.join(this.projectRoot, this.configRelativePath)).then(
+      () => true,
+      () => false,
+    );
   }
   async install(): Promise<void> {
     const target = path.join(this.projectRoot, this.configRelativePath);
     await mkdir(path.dirname(target), { recursive: true });
     let current: Record<string, unknown> = {};
-    try { current = JSON.parse(await readFile(target, "utf8")) as Record<string, unknown>; } catch (error) {
+    try {
+      current = JSON.parse(await readFile(target, "utf8")) as Record<string, unknown>;
+    } catch (error) {
       if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
     }
     const generated = this.createConfig(`agent-guard hook ${this.name}`) as Record<string, unknown>;
@@ -110,24 +126,33 @@ export abstract class ProjectHookAdapter implements AgentAdapter {
       const existing: unknown[] = Array.isArray(hooks[event]) ? (hooks[event] as unknown[]) : [];
       const additions: unknown[] = Array.isArray(definitions) ? (definitions as unknown[]) : [];
       hooks[event] = [
-        ...existing.filter((group) => !JSON.stringify(group).includes(`agent-guard hook ${this.name}`)),
+        ...existing.filter(
+          (group) => !JSON.stringify(group).includes(`agent-guard hook ${this.name}`),
+        ),
         ...additions,
       ];
     }
-    await writeFile(target, `${JSON.stringify({ ...current, ...generated, hooks }, null, 2)}\n`, { mode: 0o600 });
+    await writeFile(target, `${JSON.stringify({ ...current, ...generated, hooks }, null, 2)}\n`, {
+      mode: 0o600,
+    });
   }
   async uninstall(): Promise<void> {
     const target = path.join(this.projectRoot, this.configRelativePath);
     let current: Record<string, unknown>;
-    try { current = JSON.parse(await readFile(target, "utf8")) as Record<string, unknown>; } catch (error) {
+    try {
+      current = JSON.parse(await readFile(target, "utf8")) as Record<string, unknown>;
+    } catch (error) {
       if ((error as NodeJS.ErrnoException).code === "ENOENT") return;
       throw error;
     }
     const hooks = object(current.hooks);
     for (const [event, definitions] of Object.entries(hooks)) {
       if (Array.isArray(definitions)) {
-        const filtered = definitions.filter((group) => !JSON.stringify(group).includes(`agent-guard hook ${this.name}`));
-        if (filtered.length) hooks[event] = filtered; else delete hooks[event];
+        const filtered = definitions.filter(
+          (group) => !JSON.stringify(group).includes(`agent-guard hook ${this.name}`),
+        );
+        if (filtered.length) hooks[event] = filtered;
+        else delete hooks[event];
       }
     }
     await writeFile(target, `${JSON.stringify({ ...current, hooks }, null, 2)}\n`, { mode: 0o600 });

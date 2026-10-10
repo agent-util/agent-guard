@@ -118,18 +118,32 @@ export function createProgram(): Command {
     .option("--since <date>")
     .option("--until <date>")
     .option("--json", "emit a JSON array instead of JSONL")
-    .action(async (options: { tail: string; agent?: string; operation?: string; decision?: string; since?: string; until?: string; json?: boolean }) => {
-      const guard = createAgentGuard(await loadConfig());
-      const records = await guard.queryAudit({
-        limit: Number(options.tail),
-        ...(options.agent ? { agent: options.agent } : {}),
-        ...(options.operation ? { operation: operationSchema.parse(options.operation) } : {}),
-        ...(options.decision ? { decision: options.decision as "allow" | "deny" | "ask" } : {}),
-        ...(options.since ? { since: options.since } : {}),
-        ...(options.until ? { until: options.until } : {}),
-      });
-      console.log(options.json ? JSON.stringify(records, null, 2) : records.map((record) => JSON.stringify(record)).join("\n"));
-    });
+    .action(
+      async (options: {
+        tail: string;
+        agent?: string;
+        operation?: string;
+        decision?: string;
+        since?: string;
+        until?: string;
+        json?: boolean;
+      }) => {
+        const guard = createAgentGuard(await loadConfig());
+        const records = await guard.queryAudit({
+          limit: Number(options.tail),
+          ...(options.agent ? { agent: options.agent } : {}),
+          ...(options.operation ? { operation: operationSchema.parse(options.operation) } : {}),
+          ...(options.decision ? { decision: options.decision as "allow" | "deny" | "ask" } : {}),
+          ...(options.since ? { since: options.since } : {}),
+          ...(options.until ? { until: options.until } : {}),
+        });
+        console.log(
+          options.json
+            ? JSON.stringify(records, null, 2)
+            : records.map((record) => JSON.stringify(record)).join("\n"),
+        );
+      },
+    );
   program
     .command("run")
     .description("Run a command; SDK audit only unless the command uses Agent Guard wrappers")
@@ -179,31 +193,40 @@ export function createProgram(): Command {
       ),
     );
   });
-  adapters.command("install").argument("<name>").action(async (name: string) => {
-    const adapter = adapterMap[name as keyof typeof adapterMap];
-    if (!adapter) throw new Error(`Unknown adapter: ${name}`);
-    await adapter.install();
-    console.log(`Installed ${name} project hooks.`);
-  });
-  adapters.command("uninstall").argument("<name>").action(async (name: string) => {
-    const adapter = adapterMap[name as keyof typeof adapterMap];
-    if (!adapter) throw new Error(`Unknown adapter: ${name}`);
-    await adapter.uninstall();
-    console.log(`Removed Agent Guard from ${name} project hooks.`);
-  });
-  program.command("hook").argument("<name>").action(async (name: string) => {
-    const adapter = adapterMap[name as keyof typeof adapterMap];
-    if (!adapter) throw new Error(`Unknown adapter: ${name}`);
-    try {
-      const input = JSON.parse(await readStdin()) as ToolHookInput;
-      const guard = createAgentGuard(await loadConfig());
-      const result = await evaluateToolHook(guard, name, input);
-      console.log(JSON.stringify(adapter.format(result)));
-    } catch (error) {
-      console.error(error instanceof Error ? error.message : String(error));
-      process.exitCode = 2;
-    }
-  });
+  adapters
+    .command("install")
+    .argument("<name>")
+    .action(async (name: string) => {
+      const adapter = adapterMap[name as keyof typeof adapterMap];
+      if (!adapter) throw new Error(`Unknown adapter: ${name}`);
+      await adapter.install();
+      console.log(`Installed ${name} project hooks.`);
+    });
+  adapters
+    .command("uninstall")
+    .argument("<name>")
+    .action(async (name: string) => {
+      const adapter = adapterMap[name as keyof typeof adapterMap];
+      if (!adapter) throw new Error(`Unknown adapter: ${name}`);
+      await adapter.uninstall();
+      console.log(`Removed Agent Guard from ${name} project hooks.`);
+    });
+  program
+    .command("hook")
+    .argument("<name>")
+    .action(async (name: string) => {
+      const adapter = adapterMap[name as keyof typeof adapterMap];
+      if (!adapter) throw new Error(`Unknown adapter: ${name}`);
+      try {
+        const input = JSON.parse(await readStdin()) as ToolHookInput;
+        const guard = createAgentGuard(await loadConfig());
+        const result = await evaluateToolHook(guard, name, input);
+        console.log(JSON.stringify(adapter.format(result)));
+      } catch (error) {
+        console.error(error instanceof Error ? error.message : String(error));
+        process.exitCode = 2;
+      }
+    });
   const policy = program.command("policy");
   policy.command("validate").action(async () => {
     validateConfig(await loadConfig());
@@ -213,10 +236,9 @@ export function createProgram(): Command {
   return program;
 }
 
-if (process.argv[1] && import.meta.url === new URL(`file://${path.resolve(process.argv[1])}`).href)
-  createProgram()
-    .parseAsync()
-    .catch((error: unknown) => {
-      console.error(error instanceof Error ? error.message : String(error));
-      process.exitCode = 1;
-    });
+createProgram()
+  .parseAsync()
+  .catch((error: unknown) => {
+    console.error(error instanceof Error ? error.message : String(error));
+    process.exitCode = 1;
+  });

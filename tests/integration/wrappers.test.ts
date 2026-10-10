@@ -73,10 +73,13 @@ describe("enforcement wrappers", () => {
       guard,
       "mcp",
       { operation: "rename", pathArgument: ["from", "to"] },
-      async () => { called = true; },
+      async () => {
+        called = true;
+      },
     );
-    await expect(wrapped({ name: "move_file", arguments: { from: "src/a.txt", to: "../escaped.txt" } }))
-      .rejects.toMatchObject({ code: "AGENT_GUARD_DENIED" });
+    await expect(
+      wrapped({ name: "move_file", arguments: { from: "src/a.txt", to: "../escaped.txt" } }),
+    ).rejects.toMatchObject({ code: "AGENT_GUARD_DENIED" });
     expect(called).toBe(false);
   });
   it("fails closed if audit storage cannot be written", async () => {
