@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="680" viewBox="0 0 1200 680" role="img" aria-labelledby="title desc">
+  <title id="title">Agent Guard security guarantees and limitations</title>
+  <desc id="desc">Diagram separating enforced SDK and hook operations from native sandbox responsibilities and unsupported unrelated processes.</desc>
+  <defs>
+    <style>
+      .title { font: 700 34px system-ui, sans-serif; fill: #102a2a; }
+      .heading { font: 700 24px system-ui, sans-serif; fill: #102a2a; }
+      .body { font: 18px system-ui, sans-serif; fill: #234; }
+      .small { font: 16px system-ui, sans-serif; fill: #456; }
+      .arrow { stroke: #526; stroke-width: 3; fill: none; marker-end: url(#arrow); }
+    </style>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#526"/></marker>
+  </defs>
+  <rect width="1200" height="680" rx="28" fill="#f7faf9"/>
+  <text x="600" y="58" text-anchor="middle" class="title">Agent Guard: guarantees versus limitations</text>
+
+  <rect x="55" y="105" width="500" height="455" rx="22" fill="#d9f7ee" stroke="#158f72" stroke-width="3"/>
+  <text x="305" y="150" text-anchor="middle" class="heading">Enforced when routed through Agent Guard</text>
+  <text x="90" y="205" class="body">✓ Canonical workspace boundary checks</text>
+  <text x="90" y="250" class="body">✓ Deny rules override allow rules</text>
+  <text x="90" y="295" class="body">✓ Node GuardedFs operations</text>
+  <text x="90" y="340" class="body">✓ Wrapped MCP filesystem tools</text>
+  <text x="90" y="385" class="body">✓ Supported direct agent-hook tools</text>
+  <text x="90" y="430" class="body">✓ Bound, expiring approval decisions</text>
+  <text x="90" y="475" class="body">✓ Redacted structured audit records</text>
+  <text x="305" y="530" text-anchor="middle" class="small">Policy denial occurs before the wrapped handler runs.</text>
+
+  <rect x="645" y="105" width="500" height="455" rx="22" fill="#fff0e1" stroke="#d56b1f" stroke-width="3"/>
+  <text x="895" y="150" text-anchor="middle" class="heading">Requires another security boundary</text>
+  <text x="680" y="205" class="body">! Arbitrary shell-command side effects</text>
+  <text x="680" y="250" class="body">! Unwrapped filesystem libraries</text>
+  <text x="680" y="295" class="body">! Unrelated or privileged processes</text>
+  <text x="680" y="340" class="body">! Host tools that skip local hooks</text>
+  <text x="680" y="385" class="body">! Complete elimination of mutation races</text>
+  <text x="680" y="430" class="body">! Tamper-resistant project configuration</text>
+  <text x="680" y="475" class="body">! Reliable read detection by file watchers</text>
+  <text x="895" y="530" text-anchor="middle" class="small">Use host sandboxing, containers, and least privilege.</text>
+
+  <path d="M 555 610 C 610 645, 590 645, 645 610" class="arrow"/>
+  <text x="600" y="600" text-anchor="middle" class="heading">Defense in depth</text>
+  <text x="600" y="652" text-anchor="middle" class="small">Agent Guard complements—not replaces—Claude Code, Cursor, Codex, or OS sandboxes.</text>
+</svg>

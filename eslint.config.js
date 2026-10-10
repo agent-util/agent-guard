@@ -27,7 +27,9 @@ export default tseslint.config(
   },
   {
     files: ["scripts/*.mjs"],
-    languageOptions: { globals: { console: "readonly", process: "readonly" } },
+    languageOptions: {
+      globals: { console: "readonly", process: "readonly", setTimeout: "readonly" },
+    },
     rules: {
       "@typescript-eslint/no-unsafe-assignment": "off",
       "@typescript-eslint/no-unsafe-member-access": "off",

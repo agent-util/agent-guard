@@ -1,8 +1,8 @@
 blank_issues_enabled: false
 contact_links:
   - name: Questions and support
-    url: https://github.com/agent-util/agent-guard/discussions
-    about: Ask integration and usage questions in GitHub Discussions.
+    url: https://github.com/agent-util/agent-guard/issues/new?template=support_question.yml
+    about: Ask for public installation, configuration, and integration help.
   - name: Security vulnerability
     url: https://github.com/agent-util/agent-guard/security/advisories/new
     about: Report vulnerabilities privately. Do not create a public issue.
