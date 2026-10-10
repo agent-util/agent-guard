@@ -5,6 +5,7 @@
 </p>
 
 <p align="center">
+  <a href="https://agent-util.github.io/agent-guard/"><img src="https://img.shields.io/badge/Documentation-646CFF?style=for-the-badge&logo=vitepress&logoColor=white" alt="Documentation"></a>
   <a href="https://www.npmjs.com/package/@agent-utils/agent-guard"><img src="https://img.shields.io/npm/v/@agent-utils/agent-guard?style=for-the-badge&logo=npm&label=npm" alt="npm version"></a>
   <a href="https://www.npmjs.com/package/@agent-utils/agent-guard"><img src="https://img.shields.io/npm/dm/@agent-utils/agent-guard?style=for-the-badge&logo=npm&label=downloads" alt="npm downloads"></a>
   <a href="https://github.com/agent-util/agent-guard/issues"><img src="https://img.shields.io/github/issues/agent-util/agent-guard?style=for-the-badge&logo=github&label=issues" alt="GitHub issues"></a>
@@ -19,6 +20,8 @@
 </p>
 
 An open-source TypeScript security toolkit for enforcing workspace policies, auditing filesystem operations, and adding human approval workflows to supported AI coding agents.
+
+**[Read the complete documentation →](https://agent-util.github.io/agent-guard/)**
 
 ## Why Agent Guard?
 
@@ -189,6 +192,7 @@ No file contents are logged. Webhook notifications omit paths unless explicitly 
 Contributions are welcome—from documentation fixes and adversarial fixtures to carefully verified integration adapters. Please read the [contribution guide](CONTRIBUTING.md), open an issue before substantial architectural work, and include tests for security-sensitive changes.
 
 - [Browse open issues](https://github.com/agent-util/agent-guard/issues)
+- [Read the documentation](https://agent-util.github.io/agent-guard/)
 - [Report a security vulnerability](SECURITY.md)
 - [Read the maintainer guide](docs/MAINTAINERS.md)
 - [Get project support](SUPPORT.md)

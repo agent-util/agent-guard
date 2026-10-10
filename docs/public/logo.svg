@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title">
+  <title id="title">Agent Guard shield</title>
+  <defs>
+    <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
+      <stop stop-color="#14b8a6"/>
+      <stop offset="1" stop-color="#22c55e"/>
+    </linearGradient>
+  </defs>
+  <path fill="url(#g)" d="M64 6 112 24v34c0 31-19 53-48 64C35 111 16 89 16 58V24L64 6Z"/>
+  <path fill="#062a2a" d="M64 26 91 37v21c0 18-10 32-27 41-17-9-27-23-27-41V37l27-11Z"/>
+  <path fill="none" stroke="#d1fae5" stroke-linecap="round" stroke-linejoin="round" stroke-width="9" d="m48 62 11 11 23-25"/>
+</svg>

@@ -35,6 +35,9 @@
     "test": "vitest run",
     "test:unit": "vitest run tests/unit",
     "test:integration": "vitest run tests/integration",
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs",
     "prepublishOnly": "npm run typecheck && npm run lint && npm test && npm run build"
   },
   "dependencies": {
@@ -52,6 +55,7 @@
     "tsup": "^8.5.0",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.46.2",
+    "vitepress": "^1.6.4",
     "vitest": "^4.0.7"
   },
   "keywords": [
@@ -66,7 +70,7 @@
     "type": "git",
     "url": "git+https://github.com/agent-util/agent-guard.git"
   },
-  "homepage": "https://github.com/agent-util/agent-guard#readme",
+  "homepage": "https://agent-util.github.io/agent-guard/",
   "bugs": {
     "url": "https://github.com/agent-util/agent-guard/issues"
   },
