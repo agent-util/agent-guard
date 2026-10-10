@@ -1,6 +1,6 @@
 {
   "name": "@agent-utils/agent-guard",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Security policy enforcement and auditing for supported AI agent filesystem tools.",
   "type": "module",
   "engines": {
