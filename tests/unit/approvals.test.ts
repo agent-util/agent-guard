@@ -13,6 +13,16 @@ describe("approvals", () => {
   it("denies when UI is unavailable", async () => {
     expect(await new ApprovalManager(10, 10).request(request, "id")).toBeUndefined();
   });
+  it("reuses a session grant only for its exact binding", async () => {
+    const handler = vi.fn(async () => "allow-session" as const);
+    const manager = new ApprovalManager(100, 1_000, handler);
+    const token = await manager.request(request, "id");
+    expect(manager.consume(token!, request)).toBe(true);
+    expect(manager.consume(token!, request)).toBe(true);
+    expect(await manager.request(request, "another-id")).toBe(token);
+    expect(handler).toHaveBeenCalledOnce();
+    expect(manager.consume(token!, { ...request, operation: "delete" })).toBe(false);
+  });
   it("defaults deny on timeout", async () => {
     vi.useFakeTimers();
     const manager = new ApprovalManager(10, 10, () => new Promise(() => {}));

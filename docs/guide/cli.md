@@ -22,7 +22,21 @@ agent-guard doctor
 agent-guard adapters list
 agent-guard policy validate
 agent-guard audit --tail 50
+agent-guard audit --agent codex --decision deny --since 2026-10-01 --json
 ```
+
+## Agent hooks
+
+Install or remove project-level hooks without replacing unrelated hook entries:
+
+```bash
+agent-guard adapters install claude-code
+agent-guard adapters install cursor
+agent-guard adapters install codex
+agent-guard adapters uninstall cursor
+```
+
+Commit the generated project hook configuration if you want it shared with the repository. The hook command reads the host JSON event on stdin and is normally invoked by the generated configuration, not by hand.
 
 ## Run a command
 

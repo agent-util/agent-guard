@@ -46,3 +46,16 @@ export interface AgentAdapter {
   install(): Promise<void>;
   uninstall(): Promise<void>;
 }
+
+export interface AuditFilter {
+  agent?: string;
+  operation?: FileOperation;
+  decision?: PolicyDecision;
+  enforcement?: EnforcementSource;
+  reason?: ReasonCode;
+  sessionId?: string;
+  correlationId?: string;
+  since?: string | Date;
+  until?: string | Date;
+  limit?: number;
+}

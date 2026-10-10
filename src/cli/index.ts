@@ -3,11 +3,22 @@ import { spawn } from "node:child_process";
 import os from "node:os";
 import path from "node:path";
 import { Command } from "commander";
+import packageJson from "../../package.json" with { type: "json" };
 import { createAgentGuard } from "../core/guard.js";
 import { operationSchema, validateConfig, type GuardConfigInput } from "../config/schema.js";
-import { claudeCodeAdapter, codexAdapter, cursorAdapter } from "../adapters/pending.js";
+import { claudeCodeAdapter } from "../adapters/claude-code/index.js";
+import { codexAdapter } from "../adapters/codex/index.js";
+import { cursorAdapter } from "../adapters/cursor/index.js";
+import { evaluateToolHook, type ToolHookInput } from "../adapters/hooks.js";
 
 const CONFIG_FILE = "agent-guard.config.json";
+const adapterMap = { "claude-code": claudeCodeAdapter, cursor: cursorAdapter, codex: codexAdapter };
+async function readStdin(): Promise<string> {
+  let input = "";
+  process.stdin.setEncoding("utf8");
+  for await (const chunk of process.stdin) input += String(chunk);
+  return input;
+}
 async function loadConfig(cwd = process.cwd()): Promise<GuardConfigInput> {
   return JSON.parse(await readFile(path.join(cwd, CONFIG_FILE), "utf8")) as GuardConfigInput;
 }
@@ -31,7 +42,7 @@ export function createProgram(): Command {
   const program = new Command()
     .name("agent-guard")
     .description("Policy enforcement for supported AI agent filesystem integrations")
-    .version("0.1.0");
+    .version(packageJson.version);
   program
     .command("init")
     .description("Create a secure default configuration")
@@ -101,15 +112,23 @@ export function createProgram(): Command {
   program
     .command("audit")
     .option("--tail <lines>", "number of records", "20")
-    .action(async (options: { tail: string }) => {
-      const config = validateConfig(await loadConfig());
-      const content = await readFile(
-        path.resolve(config.workspace, config.audit.file),
-        "utf8",
-      ).catch(() => "");
-      console.log(
-        content.trim().split("\n").filter(Boolean).slice(-Number(options.tail)).join("\n"),
-      );
+    .option("--agent <agent>")
+    .option("--operation <operation>")
+    .option("--decision <decision>")
+    .option("--since <date>")
+    .option("--until <date>")
+    .option("--json", "emit a JSON array instead of JSONL")
+    .action(async (options: { tail: string; agent?: string; operation?: string; decision?: string; since?: string; until?: string; json?: boolean }) => {
+      const guard = createAgentGuard(await loadConfig());
+      const records = await guard.queryAudit({
+        limit: Number(options.tail),
+        ...(options.agent ? { agent: options.agent } : {}),
+        ...(options.operation ? { operation: operationSchema.parse(options.operation) } : {}),
+        ...(options.decision ? { decision: options.decision as "allow" | "deny" | "ask" } : {}),
+        ...(options.since ? { since: options.since } : {}),
+        ...(options.until ? { until: options.until } : {}),
+      });
+      console.log(options.json ? JSON.stringify(records, null, 2) : records.map((record) => JSON.stringify(record)).join("\n"));
     });
   program
     .command("run")
@@ -159,6 +178,31 @@ export function createProgram(): Command {
         2,
       ),
     );
+  });
+  adapters.command("install").argument("<name>").action(async (name: string) => {
+    const adapter = adapterMap[name as keyof typeof adapterMap];
+    if (!adapter) throw new Error(`Unknown adapter: ${name}`);
+    await adapter.install();
+    console.log(`Installed ${name} project hooks.`);
+  });
+  adapters.command("uninstall").argument("<name>").action(async (name: string) => {
+    const adapter = adapterMap[name as keyof typeof adapterMap];
+    if (!adapter) throw new Error(`Unknown adapter: ${name}`);
+    await adapter.uninstall();
+    console.log(`Removed Agent Guard from ${name} project hooks.`);
+  });
+  program.command("hook").argument("<name>").action(async (name: string) => {
+    const adapter = adapterMap[name as keyof typeof adapterMap];
+    if (!adapter) throw new Error(`Unknown adapter: ${name}`);
+    try {
+      const input = JSON.parse(await readStdin()) as ToolHookInput;
+      const guard = createAgentGuard(await loadConfig());
+      const result = await evaluateToolHook(guard, name, input);
+      console.log(JSON.stringify(adapter.format(result)));
+    } catch (error) {
+      console.error(error instanceof Error ? error.message : String(error));
+      process.exitCode = 2;
+    }
   });
   const policy = program.command("policy");
   policy.command("validate").action(async () => {

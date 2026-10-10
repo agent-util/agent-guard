@@ -30,7 +30,7 @@ export default defineConfig({
           { text: "Releasing", link: "/community/releasing" },
         ],
       },
-      { text: "v0.1.1", link: "https://www.npmjs.com/package/@agent-utils/agent-guard" },
+      { text: "v0.2.0", link: "https://www.npmjs.com/package/@agent-utils/agent-guard" },
     ],
     sidebar: [
       {
@@ -40,6 +40,7 @@ export default defineConfig({
           { text: "Getting started", link: "/guide/getting-started" },
           { text: "Node.js agents", link: "/guide/node-agents" },
           { text: "MCP tools", link: "/guide/mcp" },
+          { text: "Agent integrations", link: "/guide/agent-integrations" },
           { text: "Approvals & events", link: "/guide/approvals-events" },
           { text: "CLI", link: "/guide/cli" },
         ],
