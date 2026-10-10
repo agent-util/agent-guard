@@ -60,6 +60,28 @@ describe("enforcement wrappers", () => {
     ).rejects.toMatchObject({ code: "AGENT_GUARD_DENIED" });
     expect(called).toBe(false);
   });
+  it("checks every protected MCP path before a rename handler", async () => {
+    const workspace = await setup();
+    const guard = createAgentGuard({
+      workspace,
+      allowedPaths: ["src"],
+      policies: { rename: "allow", outsideWorkspace: "deny" },
+      audit: { enabled: false },
+    });
+    let called = false;
+    const wrapped = wrapMcpTool(
+      guard,
+      "mcp",
+      { operation: "rename", pathArgument: ["from", "to"] },
+      async () => {
+        called = true;
+      },
+    );
+    await expect(
+      wrapped({ name: "move_file", arguments: { from: "src/a.txt", to: "../escaped.txt" } }),
+    ).rejects.toMatchObject({ code: "AGENT_GUARD_DENIED" });
+    expect(called).toBe(false);
+  });
   it("fails closed if audit storage cannot be written", async () => {
     const workspace = await setup();
     const guard = createAgentGuard({

@@ -1,6 +1,6 @@
 {
   "name": "@agent-utils/agent-guard",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "Security policy enforcement and auditing for supported AI agent filesystem tools.",
   "type": "module",
   "engines": {
@@ -35,6 +35,7 @@
     "test": "vitest run",
     "test:unit": "vitest run tests/unit",
     "test:integration": "vitest run tests/integration",
+    "test:package": "node scripts/package-smoke.mjs",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs",

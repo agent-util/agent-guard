@@ -7,6 +7,7 @@ import { ApprovalManager } from "./approvals.js";
 import { AuditLogger } from "../audit/logger.js";
 import type {
   AuditRecord,
+  AuditFilter,
   EnforcementSource,
   EvaluationRequest,
   PolicyResult,
@@ -59,9 +60,39 @@ export class AgentGuard extends GuardEventEmitter {
   }
   async stop(): Promise<void> {
     this.started = false;
+    this.approvals.clear();
   }
   async evaluate(request: EvaluationRequest): Promise<PolicyResult> {
     return this.policy.evaluate(request);
+  }
+
+  async queryAudit(filter: AuditFilter = {}): Promise<AuditRecord[]> {
+    return this.audit?.query(filter) ?? [];
+  }
+
+  async recordEvaluation(
+    request: EvaluationRequest,
+    result: PolicyResult,
+    enforcement: EnforcementSource,
+    correlationId = randomUUID(),
+  ): Promise<AuditRecord> {
+    const record: AuditRecord = {
+      timestamp: new Date().toISOString(),
+      ...request,
+      decision: result.decision,
+      reason: result.reason,
+      enforcement,
+      sessionId: this.sessionId,
+      correlationId,
+      policyVersion: this.config.policyVersion,
+    };
+    await this.audit?.write(record);
+    this.emit("audit", record);
+    if (result.decision === "deny") {
+      this.emit("violation", record);
+      this.emit("access-denied", record);
+    }
+    return record;
   }
 
   async authorize(
@@ -80,25 +111,10 @@ export class AgentGuard extends GuardEventEmitter {
         result = { ...result, decision: "allow", reason: "APPROVED", requiresApproval: false };
       else result = { ...result, decision: "deny", requiresApproval: false };
     }
-    const record: AuditRecord = {
-      timestamp: new Date().toISOString(),
-      ...request,
-      decision: result.decision,
-      reason: result.reason,
-      enforcement,
-      sessionId: this.sessionId,
-      correlationId,
-      policyVersion: this.config.policyVersion,
-    };
     try {
-      await this.audit?.write(record);
+      await this.recordEvaluation(request, result, enforcement, correlationId);
     } catch {
       result = { ...result, decision: "deny", requiresApproval: false };
-    }
-    this.emit("audit", record);
-    if (result.decision === "deny") {
-      this.emit("violation", record);
-      this.emit("access-denied", record);
     }
     return { allowed: result.decision === "allow", result, correlationId };
   }

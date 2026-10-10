@@ -1,4 +1,5 @@
 import { watch, type FSWatcher } from "node:fs";
+import { stat } from "node:fs/promises";
 import path from "node:path";
 import picomatch from "picomatch";
 
@@ -31,15 +32,25 @@ export class AuditWatcher {
           if (old) clearTimeout(old);
           this.timers.set(
             key,
-            setTimeout(() => {
-              this.timers.delete(key);
-              this.options.onEvent({
-                type: event === "rename" ? "delete-or-rename" : "create-or-modify",
-                path: target,
-                timestamp: new Date().toISOString(),
-                enforcement: "audit-only",
-              });
-            }, this.options.debounceMs ?? 100),
+            setTimeout(
+              () =>
+                void (async () => {
+                  this.timers.delete(key);
+                  // fs.watch does not portably distinguish create, delete, and rename.
+                  // Preserve that uncertainty rather than inventing attribution.
+                  const exists = await stat(target).then(
+                    () => true,
+                    () => false,
+                  );
+                  this.options.onEvent({
+                    type: event === "rename" && !exists ? "delete-or-rename" : "create-or-modify",
+                    path: target,
+                    timestamp: new Date().toISOString(),
+                    enforcement: "audit-only",
+                  });
+                })(),
+              this.options.debounceMs ?? 100,
+            ),
           );
         }),
       );

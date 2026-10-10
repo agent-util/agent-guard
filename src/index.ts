@@ -6,13 +6,14 @@ export { ApprovalManager } from "./core/approvals.js";
 export type { ApprovalHandler, ApprovalPrompt } from "./core/approvals.js";
 export { createGuardedFs, GuardedFs, AccessDeniedError } from "./adapters/node/index.js";
 export { wrapMcpTool, wrapMcpTools } from "./adapters/mcp/index.js";
+export { McpAccessDeniedError } from "./adapters/mcp/index.js";
 export type { McpToolCall, McpToolHandler, McpToolRule } from "./adapters/mcp/index.js";
-export {
-  claudeCodeAdapter,
-  cursorAdapter,
-  codexAdapter,
-  PendingDocumentedAdapter,
-} from "./adapters/pending.js";
+export { ClaudeCodeAdapter, claudeCodeAdapter } from "./adapters/claude-code/index.js";
+export { CursorAdapter, cursorAdapter } from "./adapters/cursor/index.js";
+export { CodexAdapter, codexAdapter } from "./adapters/codex/index.js";
+export { evaluateToolHook, extractHookRequests } from "./adapters/hooks.js";
+export type { HookEvaluation, ToolHookInput } from "./adapters/hooks.js";
+export { AuditLogger, redactAuditRecord } from "./audit/logger.js";
 export { AuditWatcher } from "./monitoring/watcher.js";
 export { terminalNotifier } from "./notifications/terminal.js";
 export { webhookNotifier } from "./notifications/webhook.js";

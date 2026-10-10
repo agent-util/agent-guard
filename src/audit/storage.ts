@@ -1,4 +1,4 @@
-import { mkdir, open, rename, rm, stat } from "node:fs/promises";
+import { mkdir, open, readFile, rename, rm, stat } from "node:fs/promises";
 import path from "node:path";
 
 export class JsonlStorage {
@@ -21,6 +21,22 @@ export class JsonlStorage {
     } finally {
       await handle.close();
     }
+  }
+  async readAll<T>(): Promise<T[]> {
+    const files = Array.from({ length: this.retentionFiles }, (_, index) =>
+      index === 0 ? this.file : `${this.file}.${index}`,
+    ).reverse();
+    const values: T[] = [];
+    for (const file of files) {
+      const content = await readFile(file, "utf8").catch((error: NodeJS.ErrnoException) => {
+        if (error.code === "ENOENT") return "";
+        throw error;
+      });
+      for (const line of content.split("\n")) {
+        if (line.trim()) values.push(JSON.parse(line) as T);
+      }
+    }
+    return values;
   }
   private async rotate(): Promise<void> {
     await rm(`${this.file}.${this.retentionFiles}`, { force: true });

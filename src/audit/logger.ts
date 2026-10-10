@@ -1,5 +1,5 @@
 import path from "node:path";
-import type { AuditRecord } from "../types/index.js";
+import type { AuditFilter, AuditRecord } from "../types/index.js";
 import { JsonlStorage } from "./storage.js";
 
 const sensitive =
@@ -23,5 +23,24 @@ export class AuditLogger {
   }
   write(record: AuditRecord): Promise<void> {
     return this.storage.append(this.redact ? redactAuditRecord(record) : record);
+  }
+  async query(filter: AuditFilter = {}): Promise<AuditRecord[]> {
+    const since = filter.since ? new Date(filter.since).getTime() : -Infinity;
+    const until = filter.until ? new Date(filter.until).getTime() : Infinity;
+    const records = (await this.storage.readAll<AuditRecord>()).filter((record) => {
+      const timestamp = new Date(record.timestamp).getTime();
+      return (
+        timestamp >= since &&
+        timestamp <= until &&
+        (!filter.agent || record.agent === filter.agent) &&
+        (!filter.operation || record.operation === filter.operation) &&
+        (!filter.decision || record.decision === filter.decision) &&
+        (!filter.enforcement || record.enforcement === filter.enforcement) &&
+        (!filter.reason || record.reason === filter.reason) &&
+        (!filter.sessionId || record.sessionId === filter.sessionId) &&
+        (!filter.correlationId || record.correlationId === filter.correlationId)
+      );
+    });
+    return filter.limit === undefined ? records : records.slice(-Math.max(0, filter.limit));
   }
 }

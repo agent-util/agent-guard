@@ -14,7 +14,9 @@ Filesystem watchers report create, change, delete, and rename-like events with p
 
 ## Vendor integrations
 
-The package does not ship guessed or undocumented integrations for Claude Code, Cursor, or OpenAI Codex. Pending or unsupported capabilities remain explicitly marked until an official cancellation hook can be verified and tested.
+Project adapters use documented blocking hooks: Claude Code `PreToolUse`, Cursor `preToolUse`, and Codex `PreToolUse`. They cover only the direct file tools listed in the capability matrix. They do not intercept arbitrary shell filesystem access, hosted tools, early read-only Cursor Cloud exploration, disabled hooks, untrusted-project configurations, or specialized host paths that bypass local hooks.
+
+Hook configuration can be changed by anyone who can modify the project. Use enterprise-managed policy where tamper resistance is required. Keep each host's sandbox and native approval system enabled; Agent Guard does not replace them.
 
 ## Platform differences
 

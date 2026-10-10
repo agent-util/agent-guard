@@ -31,6 +31,7 @@ AI coding agents can read, create, modify, execute, or delete files while comple
 - **Deny-first policy rules** for sensitive files and directories
 - **Human approval** with timeouts, scoped tokens, and replay prevention
 - **Enforcing wrappers** for custom Node.js agents and MCP tools
+- **Documented project hooks** for direct file tools in Claude Code, Cursor, and Codex
 - **Structured audit logs** with redaction, rotation, and correlation IDs
 - **Security events** for terminal, webhook, and desktop adapters
 - **Cross-platform API** for Node.js 20+ on macOS, Linux, and Windows
@@ -130,11 +131,20 @@ agent-guard check ../secrets/.env --operation read
 agent-guard audit
 agent-guard doctor
 agent-guard adapters list
+agent-guard adapters install claude-code
+agent-guard adapters install cursor
+agent-guard adapters install codex
 agent-guard policy validate
 agent-guard run -- npm test
 ```
 
-Exit codes for `check` are `0` for allow, `1` for deny, and `2` for ask. `run` clearly reports that the child process is **not sandboxed**.
+Exit codes for `check` are `0` for allow, `1` for deny, and `2` for ask. Adapter installation preserves unrelated project hooks and can be reversed with `agent-guard adapters uninstall <name>`. `run` clearly reports that the child process is **not sandboxed**.
+
+## Agent hook integrations
+
+The optional project adapters evaluate direct file-tool requests before execution and return each host's documented blocking response. An `ask` policy delegates approval to the host's native prompt. See the [integration guide](https://agent-util.github.io/agent-guard/guide/agent-integrations) for installation, exact coverage, and limitations.
+
+Agent Guard intentionally does not treat shell-command approval as filesystem confinement. Keep Claude Code permissions, Cursor run modes, and the Codex sandbox enabled.
 
 ## Configuration
 
@@ -163,14 +173,14 @@ Webhook delivery is disabled until explicitly configured and omits filesystem pa
 
 ## Compatibility matrix
 
-| Integration  |        Read |       Write |      Delete |     Execute |    Approval |       Audit | Enforcement scope                            |
-| ------------ | ----------: | ----------: | ----------: | ----------: | ----------: | ----------: | -------------------------------------------- |
-| Node SDK     |         Yes |         Yes |         Yes |          No |         Yes |         Yes | Calls through `GuardedFs`                    |
-| MCP wrapper  |         Yes |         Yes |         Yes |         Yes |         Yes |         Yes | Registered wrapped tools only                |
-| Claude Code  |     Pending |     Pending |     Pending |     Pending |     Pending |     Pending | No unverified integration shipped            |
-| Cursor       | Unsupported | Unsupported | Unsupported | Unsupported | Unsupported | Unsupported | Does not override Cursor sandbox             |
-| OpenAI Codex | Unsupported | Unsupported | Unsupported | Unsupported | Unsupported | Unsupported | Use Codex sandbox and approvals              |
-| Watcher      |          No |          No |          No |          No |          No |         Yes | Audit-only changes; reads are not observable |
+| Integration  | Read | Write | Delete | Execute | Approval | Audit | Enforcement scope                            |
+| ------------ | ---: | ----: | -----: | ------: | -------: | ----: | -------------------------------------------- |
+| Node SDK     |  Yes |   Yes |    Yes |      No |      Yes |   Yes | Calls through `GuardedFs`                    |
+| MCP wrapper  |  Yes |   Yes |    Yes |     Yes |      Yes |   Yes | Registered wrapped tools only                |
+| Claude Code  |  Yes |   Yes |     No |      No |      Yes |   Yes | Matched `PreToolUse` direct file tools       |
+| Cursor       |  Yes |   Yes |     No |      No |      Yes |   Yes | Matched `preToolUse` direct file tools       |
+| OpenAI Codex |   No |   Yes |    Yes |      No |      Yes |   Yes | `apply_patch` through project hooks          |
+| Watcher      |   No |    No |     No |      No |       No |   Yes | Audit-only changes; reads are not observable |
 
 ## Security architecture and limitations
 
@@ -182,10 +192,10 @@ No file contents are logged. Webhook notifications omit paths unless explicitly 
 
 ## Roadmap
 
-- Verify and implement official vendor hook integrations where cancellation semantics are documented
 - Add opt-in platform sandbox launchers
 - Add native handle-relative mutation adapters where platforms expose safe APIs
-- Expand structured audit filtering and platform notification adapters
+- Expand direct-tool coverage only as stable documented hook contracts become available
+- Add signed webhook delivery and more platform notification adapters
 
 ## Contributing
 

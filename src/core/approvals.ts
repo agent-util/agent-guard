@@ -5,6 +5,7 @@ interface ApprovalGrant {
   binding: string;
   expiresAt: number;
   used: boolean;
+  reusable: boolean;
 }
 export interface ApprovalPrompt {
   request: EvaluationRequest;
@@ -28,6 +29,11 @@ export class ApprovalManager {
   }
 
   async request(request: EvaluationRequest, correlationId: string): Promise<string | undefined> {
+    const binding = this.binding(request);
+    for (const [token, grant] of this.grants) {
+      if (grant.reusable && grant.binding === binding && grant.expiresAt >= Date.now())
+        return token;
+    }
     if (!this.handler) return undefined;
     let timer: NodeJS.Timeout | undefined;
     try {
@@ -41,10 +47,11 @@ export class ApprovalManager {
       if (answer === "deny") return undefined;
       const token = randomBytes(32).toString("base64url");
       this.grants.set(token, {
-        binding: this.binding(request),
+        binding,
         expiresAt:
           answer === "allow-session" ? Number.MAX_SAFE_INTEGER : Date.now() + this.tokenTtlMs,
         used: false,
+        reusable: answer === "allow-session",
       });
       return token;
     } catch {
@@ -56,12 +63,18 @@ export class ApprovalManager {
 
   consume(token: string, request: EvaluationRequest): boolean {
     const grant = this.grants.get(token);
-    if (!grant || grant.used || grant.expiresAt < Date.now()) return false;
+    if (!grant || (!grant.reusable && grant.used) || grant.expiresAt < Date.now()) return false;
     const expected = Buffer.from(grant.binding);
     const actual = Buffer.from(this.binding(request));
     if (expected.length !== actual.length || !timingSafeEqual(expected, actual)) return false;
-    grant.used = true;
-    this.grants.delete(token);
+    if (!grant.reusable) {
+      grant.used = true;
+      this.grants.delete(token);
+    }
     return true;
+  }
+
+  clear(): void {
+    this.grants.clear();
   }
 }
