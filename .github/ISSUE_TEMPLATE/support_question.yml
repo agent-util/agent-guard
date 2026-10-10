@@ -1,0 +1,53 @@
+name: Support question
+description: Ask for help with installation, configuration, or an integration.
+title: "[Support]: "
+labels: ["question"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form for public usage help. For vulnerabilities, use GitHub private security reporting instead. Remove credentials, source code, and sensitive filesystem paths.
+  - type: input
+    id: version
+    attributes:
+      label: Agent Guard version
+      placeholder: 0.2.0
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: Node.js version, operating system, package manager, and agent integration.
+      placeholder: Node.js 22, Windows 11, npm 10, Claude Code
+    validations:
+      required: true
+  - type: textarea
+    id: goal
+    attributes:
+      label: What are you trying to do?
+    validations:
+      required: true
+  - type: textarea
+    id: attempted
+    attributes:
+      label: What have you tried?
+      description: Include a minimal configuration or commands with all sensitive values removed.
+    validations:
+      required: true
+  - type: textarea
+    id: result
+    attributes:
+      label: What happened?
+      description: Include the exact non-sensitive error and the result you expected.
+    validations:
+      required: true
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Safety checks
+      options:
+        - label: I removed secrets, private source code, and sensitive paths.
+          required: true
+        - label: This is not a vulnerability report.
+          required: true

@@ -20,6 +20,7 @@ export default defineConfig({
     search: { provider: "local" },
     nav: [
       { text: "Guide", link: "/guide/getting-started" },
+      { text: "Demo", link: "/guide/security-demo" },
       { text: "Reference", link: "/reference/configuration" },
       { text: "Security", link: "/security/threat-model" },
       {
@@ -38,6 +39,8 @@ export default defineConfig({
         items: [
           { text: "Introduction", link: "/guide/introduction" },
           { text: "Getting started", link: "/guide/getting-started" },
+          { text: "Security demo", link: "/guide/security-demo" },
+          { text: "Copy-paste examples", link: "/guide/copy-paste-examples" },
           { text: "Node.js agents", link: "/guide/node-agents" },
           { text: "MCP tools", link: "/guide/mcp" },
           { text: "Agent integrations", link: "/guide/agent-integrations" },
@@ -59,6 +62,11 @@ export default defineConfig({
           { text: "Architecture", link: "/security/architecture" },
           { text: "Threat model", link: "/security/threat-model" },
           { text: "Known limitations", link: "/security/limitations" },
+          {
+            text: "Guarantees vs limitations",
+            link: "/security/guarantees-vs-limitations",
+          },
+          { text: "Threat-model article", link: "/articles/threat-model" },
         ],
       },
       {
@@ -66,6 +74,8 @@ export default defineConfig({
         items: [
           { text: "Contributing", link: "/community/contributing" },
           { text: "Support", link: "/community/support" },
+          { text: "Installation testing", link: "/community/installation-testing" },
+          { text: "Good first issues", link: "/community/good-first-issues" },
           { text: "Maintainers", link: "/community/maintainers" },
           { text: "Releasing", link: "/community/releasing" },
         ],

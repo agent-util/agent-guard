@@ -2,7 +2,7 @@
 
 ## Questions and usage help
 
-Use [GitHub Discussions](https://github.com/agent-util/agent-guard/discussions) for integration questions, design conversations, and general help. Include your Agent Guard version, Node.js version, operating system, enforcement adapter, and a minimal configuration with all secrets removed.
+Use the [support-question form](https://github.com/agent-util/agent-guard/issues/new?template=support_question.yml) for public integration questions and general help. Use the [installation feedback form](https://github.com/agent-util/agent-guard/issues/new?template=installation_feedback.yml) for first-time setup problems. Include your Agent Guard version, Node.js version, operating system, enforcement adapter, and a minimal configuration with all secrets removed.
 
 ## Bugs and feature requests
 

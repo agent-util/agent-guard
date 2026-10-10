@@ -13,8 +13,8 @@ hero:
       text: Get started
       link: /guide/getting-started
     - theme: alt
-      text: Security model
-      link: /security/threat-model
+      text: Watch the demo
+      link: /guide/security-demo
     - theme: alt
       text: View on GitHub
       link: https://github.com/agent-util/agent-guard
@@ -45,6 +45,8 @@ features:
 ```bash
 npm install @agent-utils/agent-guard
 ```
+
+Try the repository's paced terminal demonstration with `npm run demo`, or use `npm run demo:quick` in CI.
 
 Agent Guard supports Node.js 20 or newer and ships ESM, CommonJS, and TypeScript declarations.
 

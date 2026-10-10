@@ -21,7 +21,7 @@
 
 An open-source TypeScript security toolkit for enforcing workspace policies, auditing filesystem operations, and adding human approval workflows to supported AI coding agents.
 
-**[Read the complete documentation →](https://agent-util.github.io/agent-guard/)**
+**[Read the documentation](https://agent-util.github.io/agent-guard/) · [Run the security demo](https://agent-util.github.io/agent-guard/guide/security-demo) · [Copy an integration](https://agent-util.github.io/agent-guard/guide/copy-paste-examples)**
 
 ## Why Agent Guard?
 
@@ -55,6 +55,17 @@ yarn add @agent-utils/agent-guard
 ```
 
 Node.js 20 or newer is required. Both ESM imports and CommonJS `require()` are exported.
+
+## 60–90 second demo
+
+Clone the repository and run the paced terminal demonstration:
+
+```bash
+npm ci
+npm run demo
+```
+
+It allows a source read, denies a `.env` read, blocks an MCP write outside the workspace before its handler runs, and prints the redacted audit decisions. Use `npm run demo:quick` for an unpaced verification.
 
 ## Quick start
 
@@ -186,7 +197,7 @@ Webhook delivery is disabled until explicitly configured and omits filesystem pa
 
 Paths are resolved against a canonical workspace and the nearest existing ancestor, preventing ordinary traversal and symlink-parent escapes. Deny patterns override allow patterns. Reads and in-place writes use verified handles.
 
-Path-based create, rename, and delete operations retain time-of-check/time-of-use risk, as do hostile network filesystems and privileged hard-link manipulation. See the [architecture](docs/ARCHITECTURE.md), [threat model](docs/THREAT_MODEL.md), and [security policy](SECURITY.md).
+Path-based create, rename, and delete operations retain time-of-check/time-of-use risk, as do hostile network filesystems and privileged hard-link manipulation. See the [guarantees versus limitations diagram](https://agent-util.github.io/agent-guard/security/guarantees-vs-limitations), [technical threat-model article](https://agent-util.github.io/agent-guard/articles/threat-model), [architecture](docs/ARCHITECTURE.md), and [security policy](SECURITY.md).
 
 No file contents are logged. Webhook notifications omit paths unless explicitly configured otherwise.
 
