@@ -1,0 +1,79 @@
+{
+  "name": "@agent-utils/agent-guard",
+  "version": "0.1.0",
+  "description": "Security policy enforcement and auditing for supported AI agent filesystem tools.",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "bin": {
+    "agent-guard": "./dist/cli/index.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "SECURITY.md"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "vitest run",
+    "test:unit": "vitest run tests/unit",
+    "test:integration": "vitest run tests/integration",
+    "prepublishOnly": "npm run typecheck && npm run lint && npm test && npm run build"
+  },
+  "dependencies": {
+    "commander": "^14.0.0",
+    "picomatch": "^4.0.3",
+    "zod": "^4.1.12"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.38.0",
+    "@types/node": "^24.10.0",
+    "@types/picomatch": "^4.0.2",
+    "eslint": "^9.38.0",
+    "eslint-config-prettier": "^10.1.8",
+    "prettier": "^3.6.2",
+    "tsup": "^8.5.0",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.46.2",
+    "vitest": "^4.0.7"
+  },
+  "keywords": [
+    "ai",
+    "agent",
+    "security",
+    "filesystem",
+    "mcp"
+  ],
+  "author": "Dheeraj Kumar",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/agent-util/agent-guard.git"
+  },
+  "homepage": "https://github.com/agent-util/agent-guard#readme",
+  "bugs": {
+    "url": "https://github.com/agent-util/agent-guard/issues"
+  },
+  "funding": "https://github.com/sponsors/Dheerajprogrammer",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  }
+}
